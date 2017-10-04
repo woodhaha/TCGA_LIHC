@@ -60,20 +60,20 @@ data_categories=(TCGAbiolinks:::getProjectSummary(ID)$data_categories)$data_cate
 # [7] "Raw Sequencing Data
 
 query.nocnv= GDCquery(project = ID,
-                 data.category = "Copy number variation",
-                 platform="Affymetrix SNP Array 6.0",
-                 file.type = "nocnv_hg19.seg",
-                 legacy = TRUE)
+                      data.category = "Copy number variation",
+                      platform="Affymetrix SNP Array 6.0",
+                      file.type = "nocnv_hg19.seg",
+                      legacy = TRUE)
 GDCdownload(query.nocnv)
 LIHC.nocnvhg19 = GDCprepare(query.nocnv)
 save(LIHC.nocnvhg19,file = paste0(oldTCGA_dir,"CNVs/LIHC.nocnvhg19.rda"))
 
 
 query.cnv= GDCquery(project = ID,
-                      data.category = "Copy number variation",
-                      platform="Affymetrix SNP Array 6.0",
-                      file.type = "hg19.seg",
-                      legacy = TRUE)
+                    data.category = "Copy number variation",
+                    platform="Affymetrix SNP Array 6.0",
+                    file.type = "hg19.seg",
+                    legacy = TRUE)
 GDCdownload(query.cnv)
 LIHC.cnvhg19 = GDCprepare(query.cnv)
 save(LIHC.cnvhg19,file = paste0(oldTCGA_dir,"CNVs/LIHC.cnvhg19.rda"))
@@ -106,73 +106,29 @@ save(LIHC.mirna,file = paste0(oldTCGA_dir,"mirna/LIHC.mirna.rda"))
 
 ##hg19.mirbase20
 query.hg19.mirbase20 = GDCquery(project = ID, 
-                       data.category = "Gene expression",
-                       data.type = "miRNA gene quantification",
-                       file.type = "hg19.mirbase20",
-                       legacy = TRUE)
+                                data.category = "Gene expression",
+                                data.type = "miRNA gene quantification",
+                                file.type = "hg19.mirbase20",
+                                legacy = TRUE)
 GDCdownload(query.hg19.mirbase20)
 LIHC.hg19.mirbase20 = GDCprepare(query.hg19.mirbase20)
 save(LIHC.hg19.mirbase20,file = paste0(oldTCGA_dir,"mirna/LIHC.hg19.mirbase20.rda"))
-                               
-##(5)Simple nucleotide variation
-##------------------------------
-# Function to get two samples to test the function
-legacyPipeline = function(project, data.category, platform){
-  query = GDCquery(project = project,
-                    data.category = data.category,
-                    platform = platform,
-                    legacy = TRUE)
-  #cases = query$results[[1]]$cases[1:2]
-  query = GDCquery(project = project,
-                    data.category = data.category,
-                    platform = platform,
-                    legacy = TRUE)#,
-                    #barcode = cases)
-  GDCdownload(query)
-  data = GDCprepare(query)
-  return(data)
-}
 
-LIHC.maf = legacyPipeline(ID,"Simple nucleotide variation")
-
-
+##(5)Simple nucleotide variation(not work for TCGAbiolinks)
+##---------------------------------------------------------
 ##Check maf availables
 query.maf.hg19 = GDCquery(project = ID,
                           data.category = "Simple nucleotide variation",
                           data.type = "Simple somatic mutation",
-                          access = "open",
+                          file.type = "bcgsc.ca_LIHC.IlluminaHiSeq_DNASeq.1.somatic.maf",
                           legacy = TRUE)
 
 GDCdownload(query.maf.hg19)
 LIHC.mutect.maf = GDCprepare(query.maf.hg19)
-save(LIHC.mutect.maf,file = paste0(oldTCGA_dir,"maf/LIHC.mutect.maf.rda"))
+save(LIHC.mutect.maf,file = paste0(oldTCGA_dir,"maf/GDC/LIHC.mutect.maf.rda"))
 
 
-##(6)Clinical and Biospecimen from GDC
-##------------------------------------
-query = GDCquery(project = ID, 
-                  data.category = "Clinical",
-                  legacy = TRUE)
-GDCdownload(query)
-clinical = GDCprepare_clinic(query, clinical.info = "patient")
-clinical.drug = GDCprepare_clinic(query, clinical.info = "drug")
-clinical.radiation = GDCprepare_clinic(query, clinical.info = "radiation")
-clinical.admin = GDCprepare_clinic(query, clinical.info = "admin")
-
-query = GDCquery(project = ID, 
-                  data.category = "Biospecimen",
-                  legacy = TRUE)
-GDCdownload(query)
-clinical.admin = GDCprepare_clinic(query, clinical.info = "admin")
-clinical.sample = GDCprepare_clinic(query, clinical.info = "sample")
-clinical.slide = GDCprepare_clinic(query, clinical.info = "slide")
-clinical.portion = GDCprepare_clinic(query, clinical.info = "portion")
-
-LIHC.clin.GDC = clinical
-save(LIHC.clin.GDC,file = paste0(oldTCGA_dir,"clin/LIHC.clin.GDC.rda"))
-
-
-##(7)Clinical from ucsc xena
+##(6)Clinical from ucsc xena
 ##--------------------------
 element = "LIHC"
 link ="https://tcga.xenahubs.net/download/"
@@ -225,19 +181,32 @@ write.csv (DFS_survial, paste0(des_dir,element,"_DFS_survial.csv"),row.names = F
 write.csv (LIHC.clin.ucsc, paste0(des_dir,element,"_clinical.ucsc.xena.csv"),row.names = F)
 
 
-##(8)Gene expression 
+##(7)Gene expression 
 ##------------------
 ##RSEM
 query.rsem = GDCquery(project = ID,
-                  data.category = "Gene expression",
-                  data.type = "Gene expression quantification",
-                  platform = "Illumina HiSeq", 
-                  file.type  = "results", 
-                  legacy = TRUE)
-              
+                      data.category = "Gene expression",
+                      data.type = "Gene expression quantification",
+                      platform = "Illumina HiSeq", 
+                      file.type  = "results", 
+                      legacy = TRUE)
+
 GDCdownload(query.rsem)
 LIHC.rsem = GDCprepare(query.rsem)
 save(LIHC.rsem,file = paste0(oldTCGA_dir,"exp/LIHC.rsem.Illumina_HiSeq.rda"))
+
+##Abstract matrix and gene and sampel information
+library(SummarizedExperiment)
+
+## get expression matrix
+LIHC.rsem.matrix = assay(LIHC.rsem)
+
+## get genes information
+genes.info = rowRanges(LIHC.rsem)
+
+## get sample information
+sample.info = colData(LIHC.rsem)
+save(LIHC.rsem.matrix,genes.info,sample.info,file = paste0(oldTCGA_dir,"exp/LIHC.rsem.matrix.gene.sample.info.Illumina_HiSeq.rda"))
 
 
 ##RSEM NORMALIZED
@@ -251,27 +220,17 @@ GDCdownload(query.rsem.normalized)
 LIHC.rsem.normalized = GDCprepare(query.rsem.normalized)
 save(LIHC.rsem.normalized,file = paste0(oldTCGA_dir,"exp/LIHC.rsem.normalized.Illumina_HiSeq.rda"))
 
-##RAW COUNT
-releaseDate = "2016-01-28"
-setwd(oldTCGA_dir)
-downloadTCGA( cancerTypes = ID,
-              dataSet = "mRNAseq_Preprocess.Level_3",
-              destDir = "./exp/rawcount",
-              date = releaseDate )
+## get expression matrix
+LIHC.rsem.normalized.matrix = assay(LIHC.rsem.normalized)
 
-folder = grep( paste0("_", element,"\\.", "|","_",element,"-FFPE)", ".*mRNA_Preprocess"),
-                list.files("./exp/rawcount"),value = TRUE)
-file = grep( paste0(element, ".uncv2.mRNAseq_raw_counts"), list.files( file.path( "./exp/rawcount",folder ) ),
-              value = TRUE)
-path = file.path( "./exp/rawcount", folder, file )
-assign( value = path, x = paste0(element, ".rnaseq.path"), envir = .GlobalEnv)
+## get genes information
+genes.info = rowRanges(LIHC.rsem.normalized)
 
-LIHC.rawcount = readTCGA(get(paste0(element,".rnaseq.path"),envir = .GlobalEnv),"rnaseq"),
-                         x = paste0(element, ".rnaseq"),
-                         envir = .GlobalEnv )
-save(LIHC.rawcount,file = paste0(oldTCGA_dir,"exp/LIHC.rawcount.Illumina_HiSeq.rda"))
+## get sample information
+sample.info = colData(LIHC.rsem.normalized)
+save(LIHC.rsem.normalized.matrix,genes.info,sample.info,file = paste0(oldTCGA_dir,"exp/LIHC.rsem.normalized.matrix.gene.sample.info.Illumina_HiSeq.rda"))
 
-##(9)Protein expression 
+##(8)Protein expression 
 ##---------------------
 query.pro = GDCquery(project = ID,
                      data.category = "Protein expression",
@@ -281,16 +240,37 @@ GDCdownload(query.pro)
 LIHC.Protein = GDCprepare(query.pro)
 save(LIHC.Protein,file = paste0(oldTCGA_dir,"protein/LIHC.ProteinExpression.rda"))
 
+##(9)Clinical and Biospecian
+query.clin = GDCquery(project = ID, 
+                      data.category = "Clinical",
+                      legacy = TRUE)
+GDCdownload(query.clin,method="client")
+clin = GDCprepare_clinic(query.clin, clinical.info = "patient")
+clin.drug = GDCprepare_clinic(query.clin, clinical.info = "drug")
+clin.radiation = GDCprepare_clinic(query.clin, clinical.info = "radiation")
+clin.admin = GDCprepare_clinic(query.clin, clinical.info = "admin")
+save(clin,clin.drug,clin.radiation,clin.admin,file = paste0(newTCGA_dir,"clin/LIHC.clin.GDC.rda"))
 
-##(10)Methylation microarray data
-##-------------------------------
-# Searching idat file for DNA methylation
-query.met450.microarray = GDCquery(project = ID,
-                                   data.category = "Raw microarray data",
-                                   legacy = TRUE)
-GDCdownload(query.met450.microarray)
-LIHC.met450.microarray = GDCprepare(query.met450.microarray)
-save(LIHC.met450.microarray,file = paste0(oldTCGA_dir,"met450.microarray/LIHC.met450.microarray.rda"))
+query.bios = GDCquery(project = ID, 
+                      data.category = "Biospecimen",
+                      legacy = TRUE)
+GDCdownload(query.bios,method="client")
+bios.admin = GDCprepare_clinic(query.bios, clinical.info = "admin")
+bios.sample = GDCprepare_clinic(query.bios, clinical.info = "sample")
+bios.slide = GDCprepare_clinic(query.bios, clinical.info = "slide")
+bios.portion = GDCprepare_clinic(query.bios, clinical.info = "portion")
+save(bios.admin,bios.sample,bios.slide,bios.portion,file = paste0(newTCGA_dir,"clin/LIHC.bios.GDC.rda"))
+
+
+# ##(9)Methylation microarray data(not work by TCGAbiolinks)
+# ##---------------------------------------------------------
+# # Searching idat file for DNA methylation
+# query.met450.microarray = GDCquery(project = ID,
+#                                    data.category = "Raw microarray data",
+#                                    legacy = TRUE)
+# GDCdownload(query.met450.microarray)
+# LIHC.met450.microarray = GDCprepare(query.met450.microarray)
+# save(LIHC.met450.microarray,file = paste0(oldTCGA_dir,"met450.microarray/LIHC.met450.microarray.rda"))
 
 
 #############################################################
@@ -299,73 +279,82 @@ save(LIHC.met450.microarray,file = paste0(oldTCGA_dir,"met450.microarray/LIHC.me
 ##Creat data directory
 data_dir="/media/H_driver/Shirley/TCGA/LIHC/"
 newTCGA_dir="/media/H_driver/Shirley/TCGA/LIHC/GDC_Harmonized/"
+setwd("/media/H_driver/Shirley/TCGA/LIHC/Junk/")
 
+##(1)Clinical and Biospecimen from GDC
+##------------------------------------
+query = GDCquery(project = ID, 
+                 data.category = "Clinical")
+GDCdownload(query)
+clin = GDCprepare_clinic(query, clinical.info = "patient")
+clin.drug = GDCprepare_clinic(query, clinical.info = "drug")
+clin.radiation = GDCprepare_clinic(query, clinical.info = "radiation")
+clin.admin = GDCprepare_clinic(query, clinical.info = "admin")
+save(clin,clin.drug,clin.radiation,clin.admin,file = paste0(newTCGA_dir,"clin/LIHC.clin.GDC.rda"))
 
-##(1)Copy number variation 
+query = GDCquery(project = ID, 
+                 data.category = "Biospecimen")
+GDCdownload(query)
+bios.admin = GDCprepare_clinic(query, clinical.info = "admin")
+bios.sample = GDCprepare_clinic(query, clinical.info = "sample")
+bios.slide = GDCprepare_clinic(query, clinical.info = "slide")
+bios.portion = GDCprepare_clinic(query, clinical.info = "portion")
+save(bios.admin,bios.sample,bios.slide,bios.portion,file = paste0(newTCGA_dir,"clin/LIHC.bios.GDC.rda"))
+
+##(2)Copy number variation 
 ##------------------------
 query = GDCquery(project = ID,
-                  data.category = "Copy Number Variation",
-                  data.type = "Copy Number Segment")
+                 data.category = "Copy Number Variation",
+                 data.type = "Copy Number Segment")
 GDCdownload(query)
 LIHC.cns = GDCprepare(query)
-save(LIHC.cns,file = paste0(oldTCGA_dir,"CNVs/LIHC.cns.rda"))
+save(LIHC.cns,file = paste0(newTCGA_dir,"CNVs/LIHC.cns.rda"))
 
 query = GDCquery(ID,
-                  "Copy Number Variation",
-                  data.type = "Masked Copy Number Segment") 
+                 data.category = "Copy Number Variation",
+                 data.type = "Masked Copy Number Segment") 
 GDCdownload(query)
 LIHC.mcns = GDCprepare(query)
-save(LIHC.mcns,file = paste0(oldTCGA_dir,"CNVs/LIHC.mcns.rda"))
+save(LIHC.mcns,file = paste0(newTCGA_dir,"CNVs/LIHC.mcns.rda"))
 
-##(2)Simple nucleotide variation 
+##(3)Simple nucleotide variation 
 ##------------------------------
 LIHC.muse.maf = GDCquery_Maf(element, pipelines = "muse")
 LIHC.varscan2.maf = GDCquery_Maf(element, pipelines = "varscan2")
 LIHC.somaticsniper.maf = GDCquery_Maf(element, pipelines = "somaticsniper")
 LIHC.mutect2.maf = GDCquery_Maf(element, pipelines = "mutect2")
-save(LIHC.muse.maf,LIHC.varscan2.maf,LIHC.somaticsniper.maf,LIHC.mutect2.maf,file = paste0(oldTCGA_dir,"CNVs/LIHC.maf.rda"))
+save(LIHC.muse.maf,LIHC.varscan2.maf,LIHC.somaticsniper.maf,LIHC.mutect2.maf,file = paste0(newTCGA_dir,"maf/LIHC.all.maf.rda"))
 
-##(2)Transcriptome Profiling 
+##(4)Transcriptome Profiling 
 ##--------------------------
 workflow.type = c("HTSeq - Counts", "HTSeq - FPKM","HTSeq - FPKM-UQ")
 for(i in workflow.type){
   print(i)
   query = GDCquery(project =ID,
-                    data.category = "Transcriptome Profiling",
-                    data.type = "Gene Expression Quantification",
-                    workflow.type = i)
+                   data.category = "Transcriptome Profiling",
+                   data.type = "Gene Expression Quantification",
+                   workflow.type = i)
   GDCdownload(query)
-  LIHC.exp.HTSeq = GDCprepare(query)
+  LIHC.HTSeq = GDCprepare(query)
+  save(LIHC.HTSeq,file = paste0(newTCGA_dir,"Transcriptome_Profiling/","LIHC.",i,".rda"))
 }
 
-save(LIHC.exp.HTSeq,file = paste0(oldTCGA_dir,"exp/LIHC.exp.HTSeq.counts.FPKM.FPKM-UQ.rda"))
-
-data.type = c("miRNA Expression Quantification","Isoform Expression Quantification")
-#data.type = c("miRNA Expression Quantification")
-for(i in data.type){
-  print(i)
-  query = GDCquery(project = ID,
-                    data.category = "Transcriptome Profiling",
-                    data.type = i,
-                    workflow.type = "BCGSC miRNA Profiling")
-  GDCdownload(query)
-  LIHC.exp.miRNA.Isoform = GDCprepare(query)
-  print(head(LIHC.miRNA))
-}
-save(LIHC.exp.miRNA.Isoform,file = paste0(oldTCGA_dir,"exp/LIHC.exp.miRNA.Isoform.rda"))
-
-
-##(3)miRNA Expression Quantification 
+##(5)miRNA Expression Quantification 
 ##----------------------------------
 query.mirna = GDCquery(project = ID, 
-                        data.category = "Transcriptome Profiling", 
-                        data.type = "miRNA Expression Quantification")
-
-
-##(3)Clinical and Biospecimen from GDC
+                       data.category = "Transcriptome Profiling", 
+                       data.type = "miRNA Expression Quantification")
+GDCdownload(query.mirna )
+LIHC.mirna = GDCprepare(query.mirna)
+save(LIHC.mirna,file = paste0(newTCGA_dir,"Transcriptome_Profiling/LIHC.mirna.rda"))
+     
+##(6)Isoform Expression Quantification 
 ##------------------------------------
-clin.GDC = GDCquery_clinic(ID, type = "clinical", save.csv = TRUE)
-biospecimen.GDC = GDCquery_clinic(ID, type = "biospecimen", save.csv = TRUE)
-save(clin.GDC,biospecimen.GDC,file = paste0(oldTCGA_dir,"clin/LIHC.clin.biospecimen.rda"))
+query.isoform = GDCquery(project = ID, 
+                       data.category = "Transcriptome Profiling", 
+                       data.type = "Isoform Expression Quantification")
+GDCdownload(query.isoform)
+LIHC.isoform = GDCprepare(query.isoform)
+save(LIHC.isoform,file = paste0(newTCGA_dir,"Transcriptome_Profiling/LIHC.isoform.rda"))
 
 
