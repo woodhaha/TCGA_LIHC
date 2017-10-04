@@ -1,5 +1,5 @@
-##Copy number variation aligned to hg19
-##-------------------------------------
+##Downloading TCGA LIHC data aligned to hg19
+##------------------------------------------
 library(GenomicDataCommons)
 library(magrittr)
 library(TCGAbiolinks)
